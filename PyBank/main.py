@@ -1,44 +1,46 @@
 import csv
 import os
 
-inputdata=os.path.join(".","rawdata","budget_data.csv")
-cou=0
-sum=0
+inputdata=os.path.join(".","rawdata","budget_data.csv")     #Set input file route
 
-with open(inputdata,"r",encoding="UTF-8") as csvfile:
-    csvreader=csv.reader(csvfile,delimiter=",")
+cou=0   #Var that counts months
+sum=0   #Var that sums total profits
 
-    title=next(csvreader)
-    print(f"{title}")
+with open(inputdata,"r",encoding="UTF-8") as csvfile:   #Open input file
+    csvreader=csv.reader(csvfile,delimiter=",")   #Open input file
 
-    for row in csvreader:
-        if row[0]!="Date":
-            cou=cou+1
-            sum=sum+float(row[1])
-            if cou==1 :
-                low=float(row[1])
-            elif cou==2:
-                chg=float(row[1])-before
-                incnum=chg
-                decnum=chg
-                incdate=row[0]
-                decdate=row[0]
-            else:
-                if (float(row[1])-before)>incnum:
-                    incnum=(float(row[1])-before)
-                    incdate=row[0]
-                if (float(row[1])-before)<decnum:
-                    decnum=(float(row[1])-before)
-                    decdate=row[0]
-            before=float(row[1])
+    title=next(csvreader)   #Title rows
+    print(f"{title}")   #Double check title rows
 
-avg=round(float((before-low)/(cou-1)),2)
-sum=round(sum,0)
+    for row in csvreader:   #For each row in file
+        if row[0]!="Date":  #Do not consider first row
+            cou=cou+1   #Count current month
+            sum=sum+float(row[1])   #Sum current profits
+            if cou==1 :    #If first month
+                low=float(row[1])   #Save profit value (for average)
+            elif cou==2:    #If second month
+                chg=float(row[1])-before    #Save profit change
+                incnum=chg  #Set initial changes for lowest and highest
+                decnum=chg  #Set initial changes for lowest and highest
+                incdate=row[0]  #Set initial dates for lowest and highest changes
+                decdate=row[0]  #Set initial dates for lowest and highest changes
+            else:   #Other months
+                if (float(row[1])-before)>incnum:   #If current profit change>than previous
+                    incnum=(float(row[1])-before)   #Save current profit change
+                    incdate=row[0]   #Save current date
+                if (float(row[1])-before)<decnum:   #If current profit change<than previous
+                    decnum=(float(row[1])-before)   #Save current profit change
+                    decdate=row[0]  #Save current date
+            before=float(row[1])    #Save current profit to compare in future periods
 
-outputfile=os.path.join("PyBankSolved.csv")
+avg=round(float((before-low)/(cou-1)),2)    #Calculate average
+sum=round(sum,0)    #Round sum
 
-res=[]
+outputfile=os.path.join("PyBankSolved.csv") #Set output file
 
+res=[]  #Set list for output file
+
+#Print results adn store results in list
 print("\n")
 res.append("\n")
 print(f"Financial Analysis")
@@ -57,6 +59,7 @@ print(f"Greatest Decrease in Profits: {decdate} $({decnum})")
 res.append("Greatest Decrease in Profits: "+str(decdate)+" $("+str(decnum)+")")
 print("\n")
 
+#Export results
 with open(outputfile, "w") as datafile:
     writer=csv.writer(datafile)
     for x in res:
